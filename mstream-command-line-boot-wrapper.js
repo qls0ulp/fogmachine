@@ -23,4 +23,4 @@ if (program.error) {
 }
 
 // Boot the server
-require("./mstream.js").serveit(program);
+require("./mstream.js").init(program);

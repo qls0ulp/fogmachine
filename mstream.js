@@ -4,7 +4,25 @@ const fs = require('fs');
 const fe = require('path');
 const bodyParser = require('body-parser');
 
-exports.serveit = function (program, callback) {
+exports.init = function (program) {
+  // Setup Secret for JWT
+  try {
+    // If user entered a filepath
+    if (fs.statSync(program.secret).isFile()) {
+      program.secret = fs.readFileSync(program.secret, 'utf8');
+    }
+  } catch (error) {
+    if (program.secret) {
+      // just use secret as is
+      program.secret = String(program.secret);
+    } else {
+      // If no secret was given, generate one
+      require('crypto').randomBytes(48, function (err, buffer) {
+        program.secret = buffer.toString('hex');
+      });
+    }
+  }
+
   var server;
   if (program.ssl && program.ssl.cert && program.ssl.key) {
     try {
@@ -32,78 +50,38 @@ exports.serveit = function (program, callback) {
     mstream.use('/public', express.static(fe.join(__dirname, program.userinterface)));
     // Serve the webapp
     mstream.get('/', function (req, res) {
-      res.sendFile(fe.join(program.userinterface, 'mstream.html'), { root: __dirname });
+      res.sendFile(fe.join(program.userinterface, 'public.html'), { root: __dirname });
     });
     // Serve Shared Page
-    mstream.all('/shared/playlist/*', function (req, res) {
-      res.sendFile(fe.join(program.userinterface, 'shared.html'), { root: __dirname });
+    mstream.all('/admin', function (req, res) {
+      res.sendFile(fe.join(program.userinterface, 'admin.html'), { root: __dirname });
     });
   }
+
   // Setup Album Art
   if (!program.albumArtDir) {
     program.albumArtDir = fe.join(__dirname, 'image-cache');
   }
 
-  // Setup Secret for JWT
-  try {
-    // If user entered a filepath
-    if (fs.statSync(program.secret).isFile()) {
-      program.secret = fs.readFileSync(program.secret, 'utf8');
-    }
-  } catch (error) {
-    if (program.secret) {
-      // just use secret as is
-      program.secret = String(program.secret);
-    } else {
-      // If no secret was given, generate one
-      require('crypto').randomBytes(48, function (err, buffer) {
-        program.secret = buffer.toString('hex');
-      });
-    }
-  }
-
   // Album art endpoint
   mstream.use('/album-art', express.static(program.albumArtDir));
-
-
-  // Login functionality
-  program.auth = false;
-  if (program.users) {
-    require('./modules/login.js').setup(mstream, program, express);
-    program.auth = true;
-  } else {
-    program.users = {
-      "mstream-user": {
-        vpaths: [],
-        username: "mstream-user",
-        admin: true
-      }
-    }
-
-    // Fill iin user vpaths
-    for (var key in program.folders) {
-      program.users['mstream-user'].vpaths.push(key);
-    }
-
-    // Fill in the necessary middleware
-    mstream.use(function (req, res, next) {
-      req.user = program.users['mstream-user'];
-      next();
-    });
-  }
-
-  // Used to determine the user has a working login token
-  mstream.get('/ping', function (req, res) {
-    res.json({
-      vpaths: req.user.vpaths,
-      guest: false
-    });
-  });
 
   // // Setup all folders with express static
   // for (var key in program.folders) {
   //   mstream.use('/media/' + key + '/', express.static(program.folders[key].root));
   // }
+
+  // User System and Login API + Middleware
+  // TODO: Require this on prod version
+  if (program.users) {
+    require("./modules/login.js").setup(mstream, program);
+  }
+
+  // Used to determine the user has a working login token
+  mstream.get('/ping', function (req, res) {
+    res.json({ success: true });
+  });
+
 
   // Start the server!
   // TODO: Check if port is in use before firing up server
@@ -117,24 +95,23 @@ exports.serveit = function (program, callback) {
     });
 
     // Handle Port Forwarding
-    if (program.tunnel) {
-      try {
-        require('./modules/auto-port-forwarding.js').setup(program, function (status) {
-          if (status === true) {
-            require('public-ip').v4().then(ip => {
-              exports.addresses.internet = protocol + '://' + ip + ':' + program.port;
-              exports.logit('Access mStream on your local network:the internet: ' + exports.addresses.internet);
-            });
-          } else {
-            console.log('Port Forwarding Failed');
-            console.log('Port Forwarding Failed.  The server is running but you will have to configure your own port forwarding');
-          }
+    if (!program.tunnel) {
+      return
+    }
+
+    try {
+      require('./modules/auto-port-forwarding.js').setup(program, function (status) {
+        if (status !== true) {
+          throw "Port Forwarding Failed";
+        }
+        require('public-ip').v4().then(ip => {
+          exports.addresses.internet = protocol + '://' + ip + ':' + program.port;
+          exports.logit('Access mStream on your local network:the internet: ' + exports.addresses.internet);
         });
-      } catch (err) {
-        console.log('Port Forwarding Failed');
-        console.log('Port Forwarding Failed.  The server is running but you will have to configure your own port forwarding');
-      }
+      });
+    } catch (err) {
+      console.log('Port Forwarding Failed');
+      console.log('Port Forwarding Failed.  The server is running but you will have to configure your own port forwarding');
     }
   });
-
 }
