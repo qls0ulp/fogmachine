@@ -7,25 +7,15 @@ Using a JSON config with mStream allows for more advanced configurations.  This 
   "port": 3030,
   "userinterface":"public",
   "secret": "b6j7j5e6u5g36ubn536uyn536unm5m67u5365vby435y54ymn",
-  "database_plugin":{
-    "dbPath":"/path/to/loki.db",
-    "interval": 2
-  },
+  "database": "/path/to/fog.db"
   "albumArtDir": "/media/album-art",
-  "folders": {
-    "blues": "/media/music/blues",
-    "rock": { "root": "/media/music/rock"}
-  },
+  "media": "/path/to/media"
   "users": {
     "paul": {
-      "password":"p@ssword",
-      "vpaths": ["blues", "rock"]
+      "password":"p@ssword"
     },
     "james": {
-      "password":"qwerty",
-      "vpaths": "rock",
-      "lastfm-user": "username",
-      "lastfm-password": "password"
+      "password":"qwerty"
     }
   },
   "ssl": {

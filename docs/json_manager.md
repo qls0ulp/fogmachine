@@ -8,10 +8,10 @@ Use the `--init` flag to generate a json file or reset the file to an empty stat
 mstream --init config.json
 ```
 
-## Add a folder
+## Set Media Path
 
 ```
-mstream -j config.json --addpath /path/to/music
+mstream -j config.json --mediapath /path/to/media
 ```
 
 ## Add a user
@@ -52,10 +52,4 @@ mstream -j config.json --addcert /path/to/cert
 
 ```
 mstream -j config.json --removeuser
-```
-
-## Remove Folder
-
-```
-mstream -j config.json --removepath
 ```

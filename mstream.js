@@ -44,19 +44,17 @@ exports.init = function (program) {
   mstream.use(bodyParser.json()); // support json encoded bodies
   mstream.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-  // Setup WebApp
-  if (program.userinterface) {
-    // Give access to public folder
-    mstream.use('/public', express.static(fe.join(__dirname, program.userinterface)));
-    // Serve the webapp
-    mstream.get('/', function (req, res) {
-      res.sendFile(fe.join(program.userinterface, 'public.html'), { root: __dirname });
-    });
-    // Serve Shared Page
-    mstream.all('/admin', function (req, res) {
-      res.sendFile(fe.join(program.userinterface, 'admin.html'), { root: __dirname });
-    });
-  }
+  // Give access to public folder
+  mstream.use('/public', express.static(fe.join(__dirname, program.userinterface)));
+  // Serve the webapp
+  mstream.get('/', function (req, res) {
+    res.sendFile(fe.join(program.userinterface, 'public.html'), { root: __dirname });
+  });
+  // Serve Shared Page
+  mstream.all('/admin', function (req, res) {
+    res.sendFile(fe.join(program.userinterface, 'admin.html'), { root: __dirname });
+  });
+
 
   // Setup Album Art
   if (!program.albumArtDir) {
@@ -64,13 +62,19 @@ exports.init = function (program) {
   }
   mstream.use('/album-art', express.static(program.albumArtDir));
 
-  // // Setup all folders with express static
+  // Setup all folders with express static
   mstream.use('/media/', express.static(program.media));
+
+  // File Explorer
+  require('./modules/file-explorer.js').setup(mstream, program);
+  require('./modules/download.js').setup(mstream, program);
   
   // User System and Login API + Middleware
   if (program.users) {
     require("./modules/login.js").setup(mstream, program);
   }
+
+  require('./modules/upload.js').setup(mstream, program);
 
   // Used to determine the user has a working login token
   mstream.get('/ping', function (req, res) {

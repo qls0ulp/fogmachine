@@ -1,8 +1,6 @@
 Welcome to  the docs.   
 
 ## Install
-* [Install on Ubuntu](install.md)
-* [Install from Docker](docker.md)
 * [Install mStream + Electron](electron-install.md)
 * [Compile mStream Express from Electron](compile-mstream-express.md)
 
