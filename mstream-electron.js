@@ -10,8 +10,7 @@ const currentVer = '0.9.1';
 var apiKey;
 const ddnsDomain = 'https://ddns.mstream.io';
 let appIcon = null;
-const mkdirp = require('mkdirp');
-
+const mkdirp = require('make-dir');
 
 const AutoLaunch = require('auto-launch');
 var mstreamAutoLaunch = new AutoLaunch({
@@ -20,11 +19,11 @@ var mstreamAutoLaunch = new AutoLaunch({
 
 
 if (!fs.existsSync(fe.join(app.getPath('userData'), 'image-cache'))){
-    mkdirp(fe.join(app.getPath('userData'), 'image-cache'), function(){});
+  mkdirp.sync(fe.join(app.getPath('userData'), 'image-cache'));
 }
 
 if (!fs.existsSync(fe.join(app.getPath('userData'), 'save'))){
-    mkdirp(fe.join(app.getPath('userData'), 'save'), function(){});
+  mkdirp.sync(fe.join(app.getPath('userData'), 'save'));
 }
 
 // Errors

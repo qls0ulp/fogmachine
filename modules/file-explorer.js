@@ -1,6 +1,7 @@
 const Busboy = require("busboy");
 const fs = require("fs");
 const fe = require("path");
+const makeDir = require('make-dir');
 
 exports.setup = function(fm, program) {
   fm.post("/upload", function (req, res) {
@@ -8,12 +9,16 @@ exports.setup = function(fm, program) {
       return res.status(500).json({ error: 'No Location Provided' });
     }
 
-    // TODO: Check if path exits, if not make the path
+    const saveTo = fe.join(program.media, filename);
+
+    // Check if path exits, if not make the path
+    if (!fs.existsSync(fe.dirname(saveTo))) {
+      makeDir.sync(fe.dirname(psaveTo));
+    }
 
     const busboy = new Busboy({ headers: req.headers });
 
     busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-      const saveTo = fe.join(program.media, filename);
       console.log(`Uploading File: ${saveTo}`);
       file.pipe(fs.createWriteStream(saveTo));
     });
