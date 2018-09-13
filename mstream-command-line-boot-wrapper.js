@@ -23,5 +23,4 @@ if (program.error) {
 }
 
 // Boot the server
-const serve = require("./mstream.js");
-serve.serveit(program);
+require("./mstream.js").serveit(program);
