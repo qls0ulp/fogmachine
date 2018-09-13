@@ -332,7 +332,7 @@ function bootServer(program2) {
   var contextMenu = Menu.buildFromTemplate(trayTemplate);
 
   // TODO: Try booting server in forked thread instead.  Might give some speed improvements
-  server = require('./mstream.js');
+  server = require('./fogmachine.js');
   server.logit = function(msg){
     // Push to Window
     // ipcMain.send('info', msg);
