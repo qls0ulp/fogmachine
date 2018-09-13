@@ -1,0 +1,38 @@
+.login-overlay {
+    position: fixed;
+    padding: 0;
+    margin: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    z-index: 9;
+  }
+  
+  .login-input {
+    width: 100%;
+    border-radius: 0px !important;
+  }
+  
+  #login-submit {
+    margin-top: 15px;
+    width: 160px;
+  }
+  
+  .login-form {
+    margin-top: 55px;
+  }
+  
+  .login-header {
+    margin-top: 88px;
+  }
+  
+  .login-group {
+    margin-top: 15px;
+  }
+  
+  .hide {
+    display: none;
+  }
+  

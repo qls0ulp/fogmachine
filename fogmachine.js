@@ -55,7 +55,6 @@ exports.init = function (program) {
     res.sendFile(fe.join(program.userinterface, 'admin.html'), { root: __dirname });
   });
 
-
   // Setup Album Art
   if (!program.albumArtDir) {
     program.albumArtDir = fe.join(__dirname, 'image-cache');
@@ -68,6 +67,27 @@ exports.init = function (program) {
   // File Explorer
   require('./modules/file-explorer.js').setup(fm, program);
   require('./modules/download.js').setup(fm, program);
+
+  // DB
+  const loki = require('lokijs');
+  const db = new loki(program.database);
+  var dbFiles = db.getCollection("files");
+  var dbCollections = db.getCollection("collections");
+  var dbSubscribers = db.getCollection("subscribers");
+  var dbOrders = db.getCollection("orders");
+
+  if (dbFiles === null) {
+    dbFiles = db.addCollection("files");
+  }
+  if (dbCollections === null) {
+    dbCollections = db.addCollection("collections");
+  }
+  if (dbSubscribers === null) {
+    dbSubscribers = db.addCollection("subscribers");
+  }
+  if (dbOrders === null) {
+    dbOrders = db.addCollection("orders");
+  }
   
   // User System and Login API + Middleware
   if (program.users) {

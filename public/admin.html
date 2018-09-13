@@ -1,0 +1,159 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>FogMachine</title>
+
+  <script src="/public/js/lib/vue.min.js"></script>
+  <script src="/public/js/lib/cookie.js"></script>
+
+  <script src="/public/js/lib/izi-toast.min.js"></script>
+  <link rel="stylesheet" href="/public/css/izi-toast.min.css">
+
+  <link rel="stylesheet" href="/public/css/admin.css">
+
+  <script src="/public/js/lib/jquery-2.2.4.min.js"></script>
+
+  <!-- Pure CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w"
+  crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/grids-responsive-min.css">
+
+  <script>
+    // Auth token needed to interact with the admin API
+    var authToken = '';
+  
+    window.onload = function () {
+
+      // Setup jQuery AJAX engine to use our authToken
+      $.ajaxPrefilter(function (options) {
+        options.beforeSend = function (xhr) {
+          xhr.setRequestHeader('x-access-token', authToken);
+        }
+      });
+
+  
+      // Login Panel Vue Object
+      var loginPanel = new Vue({
+        el: '#login-overlay',
+        data: {
+          loginPending: false
+        },
+        methods: {
+          submitCode: function (e) {
+            // Store this for use in callbacks
+            var that = this;
+  
+            // Get Code
+            var username = $('#login-username').val();
+            var password = $('#login-password').val();
+            // Set pending flag
+            this.loginPending = true;
+  
+            // Check Code Against Server
+            var request = $.ajax({
+              url: "login",
+              type: "POST",
+              contentType: "application/json",
+              dataType: "json",
+              data: JSON.stringify({ username: username, password: password })
+            });
+  
+            request.done(function (msg) {
+              that.loginPending = false;
+  
+              if (!msg.token) {
+                that.loginError = 'Login Failed';
+
+                iziToast.error({
+                  title: 'Login Failed',
+                  position: 'topCenter',
+                  timeout: 3500
+                });
+                return;
+              }
+              authToken = msg.token;
+              Cookies.set('token', authToken);
+  
+              $('.login-overlay').fadeOut("slow");
+              callOnStart();
+            });
+  
+            request.fail(function (jqXHR, textStatus) {
+              that.loginPending = false;
+              iziToast.error({
+                title: 'Login Failed',
+                position: 'topCenter',
+                timeout: 3500
+              });
+            });
+          }
+        }
+      });
+  
+      // Function to test if the user is logged in with a valid token
+      function testAuthToken(token) {
+        if (token) {
+          authToken = token;
+        }
+  
+        var request = $.ajax({
+          url: "ping",
+          type: "GET",
+          dataType: "json",
+        });
+  
+        request.done(function (msg) {
+          callOnStart();
+        });
+  
+        request.fail(function (jqXHR, textStatus) {
+          $('.login-overlay').fadeIn("slow");
+          authToken = '';
+        });
+      }
+  
+      testAuthToken(Cookies.get('token'));
+  
+      function callOnStart() {
+        // Call the necessary APIs
+      }
+    };
+  </script>
+
+</head>
+
+<body>
+  <!-- Login Overlay -->
+  <div id="login-overlay" class="login-overlay hide">
+    <div class="pure-g">
+      <div class="pure-u-6-24">
+        <p></p>
+      </div>
+      <div class="pure-u-12-24">
+        <div class="login-header">
+          <h1>FogMachine</h1>
+        </div>
+        <form id="login-form" class="login-form pure-form pure-form-stacked" v-on:submit.prevent="submitCode($event)">
+          <div class="login-group">
+            <label for="login-username">Username</label>
+            <input autofocus required type="text" class="form-control login-input" id="login-username">
+          </div>
+          <div class="login-group">
+            <label for="login-password">Password</label>
+            <input required type="password" class="form-control login-input" id="login-password">
+          </div>
+          <button id="login-submit" type="submit" class="pure-button pure-button-primary" :disabled="loginPending === true ? true : false">Login</button>
+        </form>
+      </div>
+      <div class="pure-u-6-24">
+        <p></p>
+      </div>
+    </div>
+  </div>
+
+  <div>Hello World</div>
+</body>
