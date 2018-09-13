@@ -218,75 +218,7 @@ exports.deleteUser = function(current, callback) {
     });
 }
 
-exports.deleteFolder = function(current, callback) {
-  if(!current.folders || Object.keys(current.folders).length === 0){
-    console.log(colors.yellow('No folders found'));
-    return;
-  }
-
-  var folders = [];
-  Object.keys(current.folders).forEach(key => {
-    var folder = current.folders[key];
-    if (typeof folder === 'object') {
-      folder = folder.root;
-    }
-    folders.push({name: `${key}: ${folder}`});
-  });
-
-  // Display folder directories in checkbox panel
-  inquirer
-    .prompt([{
-      message: "Choose Folders To Be Deleted",
-      type: "checkbox",
-      name: "folders",
-      choices: folders
-    }])
-    .then(answers => {
-      if(!answers || !answers.folders || answers.folders.length < 1) {
-        console.log('No Folders Deleted');
-        return;
-      }
-
-      var nameArray = [];
-      answers.folders.forEach(key => {
-        var name = key.split(':');
-        delete current.folders[name[0]];
-        nameArray.push(name[0]);
-      });
-
-      Object.keys(current.users).forEach(user => {
-        current.users[user].vpaths = current.users[user].vpaths.filter(e => {
-          return !nameArray.includes(e);
-        });
-      });
-      
-      // Remove folders from users
-      callback(current);
-    });
-}
-
 exports.addUser = function(current, callback) {
-  if(!current.folders || Object.keys(current.folders).length === 0){
-    console.log(colors.yellow('You need to add a folder before you can add a user'));
-    console.log(`Use the ${colors.blue('--addpath')} command to add a folder`);
-    return;
-  }
-
-  var paths = [];
-  Object.keys(current.folders).forEach(key => {
-    paths.push({ name: key });
-  });
-
-  if (paths.length < 1) {
-    console.log(colors.yellow('You need to add a folder before you can add a user'));
-    console.log(`Use the ${colors.blue('--addpath')} command to add a folder`);
-    return;
-  }
-
-  if (paths.length === 1) {
-    paths[0].checked = true;
-  }
-
   inquirer
     .prompt([{
       message: "Username:",
@@ -313,19 +245,6 @@ exports.addUser = function(current, callback) {
         }
         return true;
       }
-    },
-    {
-      type: 'checkbox',
-      message: 'Select directories user has access to:',
-      name: 'vpaths',
-      choices: paths,
-      validate: answer => {
-        if (answer.length < 1) {
-          return 'You must choose at least one topping.';
-        }
-
-        return true;
-      }
     }])
     .then(answers => {
       if(!current.users){
@@ -334,7 +253,6 @@ exports.addUser = function(current, callback) {
 
       generateSaltedPassword(answers.password, (salt, hashedPassword) => {
         current.users[answers.username] = {
-          vpaths: answers.vpaths,
           password: hashedPassword,
           salt: salt
         };
@@ -361,7 +279,7 @@ exports.addUser = function(current, callback) {
   }
 }
 
-exports.addPath = function(current, filepath, callback) {
+exports.mediaPath = function(current, filepath, callback) {
   if(!filepath){
     console.log(colors.yellow('No path given'));
     console.log(`Please add the path after the  ${colors.blue('--addpath')} command`);
@@ -384,66 +302,6 @@ exports.addPath = function(current, filepath, callback) {
     return;
   }
 
-  // Check if the path has already been added
-  var exists = false;
-  if (current.folders) {
-    Object.keys(current.folders).forEach(key => {
-      if (typeof current.folders[key] === 'string' && current.folders[key] === filepath){
-        exists = key;
-      }
-  
-      if (typeof current.folders[key] === 'object' && current.folders[key].root && current.folders[key].root === filepath) {
-        exists = key;
-      }
-  
-      // TODO: Detect if it's a subpath as well
-    });
-  }
-
-  if (exists) {
-    console.log(colors.yellow(`Path has already been added to config under name ${exists}`));
-    console.log('Duplicate paths are technically allowed, but they use up extra system resources while not adding any functionality.');
-    console.log('If you REALLY want to do this, you can add it to your JSON file by hand');
-    return;
-  }
-
-  // Ask user for path name
-  // TODO: Prompt user to add new folder to existing users
-  inquirer
-    .prompt([{
-      message: "Path Name (no spaces or special characters):",
-      type: "input",
-      name: "name",
-      validate: answer => {
-        if (answer.length < 1) {
-          return 'Cannot be empty';
-        }
-        // Verify inputs
-        if (!/^([a-z0-9]{1,})$/.test(answer)) {
-          return 'Name cannot have spaces or special characters';
-        }
-
-        // Check that name doesn't already exist
-        var keyExists = false;
-        if (current.folders) {
-          Object.keys(current.folders).forEach(key => {
-            if (key === answer){
-              keyExists = true;
-            }
-          });
-        }
-        if (keyExists === true) {
-          return 'This name already exists';
-        }
-        return true;
-      }
-    }])
-    .then(answers => {
-      if (!current.folders) {
-        current.folders = {};
-      }
-
-      current.folders[answers.name] = { root: filepath }
-      callback(current);
-    });
+  current.media = filepath;
+  callback(current);
 }

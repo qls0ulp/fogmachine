@@ -6,10 +6,6 @@ const masterFileTypesArray = ["mp3", "flac", "wav", "ogg", "aac", "m4a"];
 
 exports.setup = function(mstream, program) {
   mstream.post("/upload", function (req, res) {
-    if (program.noUpload) {
-      return res.status(500).json({ error: 'Uploading Disabled' });
-    }
-
     if (!req.headers['data-location']) {
       return res.status(500).json({ error: 'No Location Provided' });
     }

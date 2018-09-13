@@ -1,7 +1,5 @@
-const fs = require('fs');
-
 exports.setup = function (loadJson) {
-  // TODO REDO THIS WHOLE THING
+  // TODO: Redo this with Joi
   var errorArray = [];
 
   // Check for port
@@ -14,41 +12,12 @@ exports.setup = function (loadJson) {
     loadJson.userinterface = 'public';
   }
 
-  if (!loadJson.database_plugin) {
-    loadJson.database_plugin = {};
+  if (!loadJson.database) {
+    loadJson.database = fog.db;
   }
 
-  if (!loadJson.database_plugin.dbPath) {
-    loadJson.database_plugin.dbPath = 'mstream.db';
-  }
-
-  if (loadJson.database_plugin.interval === false) {
-    loadJson.database_plugin.interval = 0;
-  }
-
-  loadJson.database_plugin.interval = Number(loadJson.database_plugin.interval);
-  if (typeof loadJson.database_plugin.interval !== 'number' || isNaN(loadJson.database_plugin.interval) || loadJson.database_plugin.interval < 0) {
-    loadJson.database_plugin.interval = 24;
-  }
-
-  if (!loadJson.folders || typeof loadJson.folders !== 'object') {
-    loadJson.folders = {
-      'media': { root: process.cwd() }
-    }
-  }
-
-  for (let folder in loadJson.folders) {
-    if (typeof loadJson.folders[folder] === 'string') {
-      let folderString = loadJson.folders[folder];
-      loadJson.folders[folder] = {
-        root: folderString
-      };
-    }
-
-    // Verify path is real
-    if (!loadJson.folders[folder].root || !fs.statSync(loadJson.folders[folder].root).isDirectory()) {
-      errorArray.push(loadJson.folders[folder].root + ' is not a real path');
-    }
+  if (!loadJson.media) {
+    loadJson.media = process.cwd();
   }
 
   if (loadJson.users && typeof loadJson.users !== 'object') {
@@ -56,14 +25,6 @@ exports.setup = function (loadJson) {
     loadJson.error = errorArray;
     return loadJson;
   }
-
-  for (let user in loadJson.users) {
-    if (typeof loadJson.users[user].vpaths === 'string') {
-      loadJson.users[user].vpaths = [loadJson.users[user].vpaths];
-    }
-  }
-
-  // TODO: Assure all users have password, or hashes + salts
 
   if (errorArray.length > 0) {
     loadJson.error = errorArray;

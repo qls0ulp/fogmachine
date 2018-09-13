@@ -67,12 +67,9 @@ exports.init = function (program) {
   mstream.use('/album-art', express.static(program.albumArtDir));
 
   // // Setup all folders with express static
-  // for (var key in program.folders) {
-  //   mstream.use('/media/' + key + '/', express.static(program.folders[key].root));
-  // }
-
+  mstream.use('/media/', express.static(program.media));
+  
   // User System and Login API + Middleware
-  // TODO: Require this on prod version
   if (program.users) {
     require("./modules/login.js").setup(mstream, program);
   }
@@ -82,36 +79,10 @@ exports.init = function (program) {
     res.json({ success: true });
   });
 
-
   // Start the server!
-  // TODO: Check if port is in use before firing up server
   server.on('request', mstream);
   server.listen(program.port, function () {
     let protocol = program.ssl && program.ssl.cert && program.ssl.key ? 'https' : 'http';
-    console.log('Access mStream locally: ' + protocol + '://localhost:' + program.port);
-
-    require('internal-ip').v4().then(ip => {
-      console.log('Access mStream on your local network: ' + protocol + '://' + ip + ':' + program.port);
-    });
-
-    // Handle Port Forwarding
-    if (!program.tunnel) {
-      return
-    }
-
-    try {
-      require('./modules/auto-port-forwarding.js').setup(program, function (status) {
-        if (status !== true) {
-          throw "Port Forwarding Failed";
-        }
-        require('public-ip').v4().then(ip => {
-          exports.addresses.internet = protocol + '://' + ip + ':' + program.port;
-          exports.logit('Access mStream on your local network:the internet: ' + exports.addresses.internet);
-        });
-      });
-    } catch (err) {
-      console.log('Port Forwarding Failed');
-      console.log('Port Forwarding Failed.  The server is running but you will have to configure your own port forwarding');
-    }
+    console.log('Access FogMachine locally: ' + protocol + '://localhost:' + program.port);
   });
 }
