@@ -2,7 +2,7 @@ const ffbinaries = require("ffbinaries");
 const fe = require("path");
 const ffmpeg = require("fluent-ffmpeg");
 
-exports.setup = function (mstream, program) {
+exports.setup = function (fm, program) {
   var dest = fe.join(__dirname, "ffmpeg");
   var platform = ffbinaries.detectPlatform();
 
@@ -29,7 +29,7 @@ exports.setup = function (mstream, program) {
       ffmpeg.setFfmpegPath(ffmpegPath);
       ffmpeg.setFfprobePath(ffprobePath);
 
-      mstream.get("/transcode/*", function (req, res) {
+      fm.get("/transcode/*", function (req, res) {
         let pathInfo = program.getVPathInfo(req.params[0]);
         if (pathInfo === false) {
           res.json({ "success": false });

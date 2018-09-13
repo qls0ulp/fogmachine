@@ -1,8 +1,8 @@
 Welcome to  the docs.   
 
 ## Install
-* [Install mStream + Electron](electron-install.md)
-* [Compile mStream Express from Electron](compile-mstream-express.md)
+* [Install FogMachine + Electron](electron-install.md)
+* [Compile FogMachine Express from Electron](compile-mstream-express.md)
 
 ## Configure
 * [Command Line Options](cli_arguments.md)

@@ -1,17 +1,17 @@
-Writing JSON config files by hand is tedious and leads to errors.  mStream comes with a command line tools to manage your config file.  
+Writing JSON config files by hand is tedious and leads to errors.  FogMachine comes with a command line tools to manage your config file.  
 
 ## Init
 
 Use the `--init` flag to generate a json file or reset the file to an empty state
 
 ```
-mstream --init config.json
+fogmachine --init config.json
 ```
 
 ## Set Media Path
 
 ```
-mstream -j config.json --mediapath /path/to/media
+fogmachine -j config.json --mediapath /path/to/media
 ```
 
 ## Add a user
@@ -19,13 +19,13 @@ mstream -j config.json --mediapath /path/to/media
 You need to add a folder before adding users
 
 ```
-mstream -j config.json --adduser
+fogmachine -j config.json --adduser
 ```
 
 ## Change Port
 
 ```
-mstream -j config.json --editport
+fogmachine -j config.json --editport
 ```
 
 ## Generate Secret
@@ -33,23 +33,23 @@ mstream -j config.json --editport
 The secret is used to sign all JSON Web Tokens. If you don't have a secret, a random one will be generated on server boot and all previous JWTs will be invalidated.  Having a secret in the config will keep JWTs valid between server reboots
 
 ```
-mstream -j config.json --makesecret
+fogmachine -j config.json --makesecret
 ```
 
 ## Add SSL Key
 
 ```
-mstream -j config.json --addkey /path/to/key
+fogmachine -j config.json --addkey /path/to/key
 ```
 
 ## Add SSL Cert
 
 ```
-mstream -j config.json --addcert /path/to/cert
+fogmachine -j config.json --addcert /path/to/cert
 ```
 
 ## Delete User
 
 ```
-mstream -j config.json --removeuser
+fogmachine -j config.json --removeuser
 ```
