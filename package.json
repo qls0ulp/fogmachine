@@ -26,19 +26,15 @@
     "ffbinaries": "^1.0.9",
     "fluent-ffmpeg": "^2.1.2",
     "inquirer": "^6.2.0",
-    "internal-ip": "^3.0.0",
     "jsonwebtoken": "^8.3.0",
     "lokijs": "^1.5.5",
     "mime-types": "^2.1.19",
     "mkdirp": "^0.5.1",
     "music-metadata": "^2.6.0",
-    "nat-upnp": "^1.1.0",
     "portscanner": "^2.1.1",
     "public-ip": "^2.4.0",
     "semver": "5.4.1",
-    "superagent": "^3.5.2",
-    "uuid": "^3.0.1",
-    "ws": "^1.1.1"
+    "superagent": "^3.5.2"
   },
   "devDependencies": {
     "electron": "1.8.6"
