@@ -22,12 +22,9 @@ fogmachine -p 4999
 # the login system will be disabled if these values are not set
 fogmachine -u username -x password
 
-# set music directory
+# set media directory
 # defaults to the current working directory if not set
 fogmachine -m /path/to/music
-
-## lastFM Scrobbling
-fogmachine -l username -z password
 ```
 
 ## Configure fogmachine with a JSON file
