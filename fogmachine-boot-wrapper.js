@@ -4,7 +4,7 @@
 // Check if we are in an electron environment
 if (process.versions["electron"]) {
   // off to a separate electron boot environment
-  require("./mstream-electron.js");
+  require("./fogmachine-electron.js");
   return;
 }
 
@@ -23,4 +23,4 @@ if (program.error) {
 }
 
 // Boot the server
-require("./mstream.js").init(program);
+require("./fogmachine.js").init(program);

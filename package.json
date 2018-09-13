@@ -1,17 +1,17 @@
 {
-  "name": "mstream",
+  "name": "fogmachine",
   "version": "3.7.0",
   "description": "music streaming server",
-  "main": "mstream-command-line-boot-wrapper.js",
+  "main": "fogmachine-boot-wrapper.js",
   "bin": {
-    "mstream": "mstream-command-line-boot-wrapper.js"
+    "fogmachine": "fogmachine-boot-wrapper.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/IrosTheBeggar/mstream-node"
+    "url": "https://github.com/IrosTheBeggar/fogmachine"
   },
   "author": "iros",
   "license": "GPL-3.0",

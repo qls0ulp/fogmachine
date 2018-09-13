@@ -3,8 +3,7 @@ node_modules/*
 image-cache/*
 !image-cache/default.png
 !image-cache/README.md
-mstreamdb.lite
-mstream.db
+*.db
 package-lock.json
 .DS_Store
 

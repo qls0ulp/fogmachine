@@ -30,9 +30,6 @@
 
   ```
   {
-    success: true,
-    message: 'Welcome To mStream',
-    vpaths: ['path1', 'path2'],
     token: 'REALLY LONG STRING'
   }
   ```
