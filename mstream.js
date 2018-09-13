@@ -62,8 +62,6 @@ exports.init = function (program) {
   if (!program.albumArtDir) {
     program.albumArtDir = fe.join(__dirname, 'image-cache');
   }
-
-  // Album art endpoint
   mstream.use('/album-art', express.static(program.albumArtDir));
 
   // // Setup all folders with express static
