@@ -2,16 +2,10 @@ const Busboy = require("busboy");
 const fs = require("fs");
 const fe = require("path");
 
-const masterFileTypesArray = ["mp3", "flac", "wav", "ogg", "aac", "m4a"];
-
-exports.setup = function(mstream, program) {
-  mstream.post("/upload", function (req, res) {
+exports.setup = function(fm, program) {
+  fm.post("/upload", function (req, res) {
     if (!req.headers['data-location']) {
       return res.status(500).json({ error: 'No Location Provided' });
-    }
-    const pathInfo = program.getVPathInfo(req.headers['data-location']);
-    if (!pathInfo.fullPath) {
-      return res.status(500).json({ error: 'Location could not be parsed' });
     }
 
     // TODO: Check if path exits, if not make the path
@@ -19,13 +13,13 @@ exports.setup = function(mstream, program) {
     const busboy = new Busboy({ headers: req.headers });
 
     busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-      const saveTo = fe.join(pathInfo.fullPath, filename);
+      const saveTo = fe.join(program.media, filename);
       console.log(`Uploading File: ${saveTo}`);
       file.pipe(fs.createWriteStream(saveTo));
     });
 
     busboy.on("finish", function () {
-      res.json({ filename: 'lol' });
+      res.json({ success: true });
     });
 
     busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated, encoding, mimetype) {
@@ -36,7 +30,7 @@ exports.setup = function(mstream, program) {
   });
   
   // parse directories
-  mstream.post("/dirparser", function(req, res) {
+  fm.post("/dirparser", function(req, res) {
     var directories = [];
     var filesArray = [];
 
@@ -51,20 +45,7 @@ exports.setup = function(mstream, program) {
       return res.json({ path: "/", contents: directories });
     }
 
-    var directory = req.body.dir;
-    let pathInfo = program.getVPathInfo(directory);
-    if (pathInfo == false) {
-      res.status(500).json({ error: "Could not find file" });
-      return;
-    }
-
-    // Make sure the user has access to the given vpath and that the vapth exists
-    if (!req.user.vpaths.includes(pathInfo.vpath)) {
-      res.status(500).json({ error: "Access Denied" });
-      return;
-    }
-
-    var path = pathInfo.fullPath;
+    var path = fe.join(program.media, req.body.dir);
 
     // Make sure it's a directory
     if (!fs.statSync(path).isDirectory()) {
@@ -72,13 +53,6 @@ exports.setup = function(mstream, program) {
       return;
     }
 
-    // Will only show these files.  Prevents people from snooping around
-    var fileTypesArray;
-    if (req.body.filetypes) {
-      fileTypesArray = req.body.filetypes;
-    } else {
-      fileTypesArray = masterFileTypesArray;
-    }
 
     // get directory contents
     var files = fs.readdirSync(path);

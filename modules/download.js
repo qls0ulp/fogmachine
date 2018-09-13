@@ -1,8 +1,9 @@
-exports.setup = function (mstream, program) {
-  const archiver = require('archiver');  // Zip Compression
-  const fe = require('path');
+const archiver = require('archiver');
+const fe = require('path');
+const fs = require('fs');
 
-  mstream.post('/download', function (req, res) {
+exports.setup = function (fm, program) {
+  fm.post('/download', function (req, res) {
     var archive = archiver('zip');
 
     archive.on('error', function (err) {
@@ -29,12 +30,11 @@ exports.setup = function (mstream, program) {
     }
 
     for (var i in fileArray) {
-      // TODO:  Confirm each item in posted data is a real file
-      let pathInfo = program.getVPathInfo(fileArray[i]);
-      if (pathInfo == false) {
-        console.log('Bad Path');
+      const pathInfo = fe.join(program.media, fileArray[i]);
+      if (!fs.existsSync(pathInfo)) {
         continue;
       }
+
       archive.file(pathInfo.fullPath, { name: fe.basename(fileArray[i]) });
     }
 
