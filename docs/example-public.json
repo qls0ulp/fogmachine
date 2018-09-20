@@ -1,0 +1,42 @@
+[
+    {
+        "id":"1",
+        "name": "My First Single",
+        "type": "single",
+        "transcoded": false,
+        "media": [
+            {
+                "title": "My First Single",
+                "file": "/media/1/single.mp3",
+                "trackNo": 1,
+                "waveform": "/media/path/to/waveform.svg"
+            }
+        ]
+    },
+    {
+        "id": "2",
+        "name": "My First Album",
+        "type": "album",
+        "transcoded": true,
+        "media": [
+            {
+                "title": "The first song",
+                "file": "/media/2/song1.mp3",
+                "trackNo": 1,
+                "waveform": "/media/path/to/waveform2.svg"
+            },
+            {
+                "title": "The second song",
+                "file": "/media/2/song2.mp3",
+                "trackNo": 2,
+                "waveform": "/media/path/to/waveform3.svg"
+            },
+            {
+                "title": "The third song",
+                "file": "/media/3/song3.mp3",
+                "trackNo": 3,
+                "waveform": "/media/path/to/waveform4.svg"
+            }
+        ]
+    }
+]
