@@ -3,6 +3,7 @@
         "id":"1",
         "name": "My First Single",
         "type": "single",
+        "genre": "house",
         "transcoded": false,
         "media": [
             {
@@ -17,6 +18,7 @@
         "id": "2",
         "name": "My First Album",
         "type": "album",
+        "genre": "house",
         "transcoded": true,
         "media": [
             {
