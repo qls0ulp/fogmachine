@@ -44,7 +44,7 @@ exports.init = function (program) {
   fm.use(bodyParser.json()); // support json encoded bodies
   fm.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-  mstream.use((req, res, next) => {
+  fm.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
