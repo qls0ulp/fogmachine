@@ -22,5 +22,22 @@ if (program.error) {
   return;
 }
 
+const colors = require('colors');
+console.clear();
+console.log(colors.bold(`
+   ___
+  | __|__  __ _
+  | _/ _ \\/ _\` |
+  |_|\\___/\\__, |  _    _
+  |  \\/  ||___/__| |_ (_)_ _  ___ 
+  | |\\/| / _\` / _| ' \\| | ' \\/ -_)
+  |_|  |_\\__,_\\__|_||_|_|_||_\\___|`));
+console.log(colors.blue.bold(`    Paul Sori - ${colors.underline('paul@fogmachine.io')}`));
+console.log(colors.blue.bold(`    Louis Dauvergne - ${colors.underline('design@mstream.io')}`));
+console.log();
+console.log(colors.magenta.bold('Find a bug? Report it at:'));
+console.log(colors.underline('https://github.com/IrosTheBeggar/fogmachine/issues'));
+console.log();
+
 // Boot the server
 require("./fogmachine.js").init(program);

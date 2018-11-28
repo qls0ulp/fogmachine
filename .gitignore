@@ -1,9 +1,10 @@
 node_modules/*
 
 image-cache/*
-!image-cache/default.png
 !image-cache/README.md
-*.db
+
+save/*.json
+
 package-lock.json
 .DS_Store
 
@@ -12,3 +13,7 @@ modules/ffmpeg/*
 .vscode/*
 
 test.json
+
+*.logs
+*.log
+*.db
