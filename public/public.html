@@ -9,16 +9,21 @@
 
   <script src="/public/js/lib/jquery-2.2.4.min.js"></script>
 
-  <!--
-  This is the mStream Player stack
-    DO NOT Change to order these are loaded in -->
-  <script src="/public/js/lib/howler.core.js"></script>
-  <script src="/public/js/mstream.player.js"></script>
+  <script>
+    var request = $.ajax({
+      url: "/api/test/all-public",
+      type: "GET",
+      dataType: "json",
+    });
 
-  <!-- These must be loaded after the player -->
-  <!-- They add functions onto the MSTREAM object -->
-  <script src="/public/js/api2.js"></script>
-  <script type="text/javascript" src="/public/js/mstream.js"></script>
+    request.done(function (msg) {
+      console.log(msg);
+    });
+
+    request.fail(function (jqXHR, textStatus) {
+      console.log('ERR')
+    });
+  </script>
 </head>
 
 <body>

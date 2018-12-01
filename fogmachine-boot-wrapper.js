@@ -33,7 +33,7 @@ console.log(colors.bold(`
   | |\\/| / _\` / _| ' \\| | ' \\/ -_)
   |_|  |_\\__,_\\__|_||_|_|_||_\\___|`));
 console.log(colors.blue.bold(`    Paul Sori - ${colors.underline('paul@fogmachine.io')}`));
-console.log(colors.blue.bold(`    Louis Dauvergne - ${colors.underline('design@mstream.io')}`));
+console.log(colors.blue.bold(`    Louis Dauvergne - ${colors.underline('design@fogmachine.io')}`));
 console.log();
 console.log(colors.magenta.bold('Find a bug? Report it at:'));
 console.log(colors.underline('https://github.com/IrosTheBeggar/fogmachine/issues'));

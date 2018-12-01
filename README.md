@@ -6,7 +6,7 @@
 # Install From Git
 git clone https://github.com/IrosTheBeggar/fogmachine.git
 cd fogmachine
-npm install --only=production
+npm install
 sudo npm link 
 ```
 

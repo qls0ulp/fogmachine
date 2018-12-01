@@ -3,23 +3,34 @@ const makeDir = require('make-dir');
 const Busboy = require("busboy");
 const fs = require("fs");
 const fe = require("path");
+const winston = require('winston');
+const loki = require('lokijs');
 
-exports.setup = function (fm, program, db) {
+var db;
+var dbCollections;
+var dbSubscribers
+var dbOrders;
+
+exports.public = function (fm, program) {
+  db = new loki(fe.join(program.storage.dbDirectory, program.filesDbName));
+
+  fm.get('/collections', (req, res) => {
+    // res.json([{"id":"1","name":"MyFirstSingle","type":"single","genre":"house","transcoded":false,"media":[{"title":"MyFirstSingle","file":"/media/1/single.mp3","trackNo":1,"waveform":"/media/path/to/waveform.svg"}]},{"id":"2","name":"MyFirstAlbum","type":"album","genre":"house","transcoded":true,"media":[{"title":"Thefirstsong","file":"/media/2/song1.mp3","trackNo":1,"waveform":"/media/path/to/waveform2.svg"},{"title":"Thesecondsong","file":"/media/2/song2.mp3","trackNo":2,"waveform":"/media/path/to/waveform3.svg"},{"title":"Thethirdsong","file":"/media/3/song3.mp3","trackNo":3,"waveform":"/media/path/to/waveform4.svg"}]}]);
+    const results = dbCollections.find({}); // TODO: Public Collections only
+    // TODO: SORT
+    res.json(results);
+  });
+}
+
+exports.admin = function (fm, program) {
   // DB
 
-  var dbFiles;
-  var dbCollections;
-  var dbSubscribers
-  var dbOrders;
+
   db.loadDatabase({}, () => {
-    dbFiles = db.getCollection("files");
     dbCollections = db.getCollection("collections");
     dbSubscribers = db.getCollection("subscribers");
     dbOrders = db.getCollection("orders");
   
-    if (dbFiles === null) {
-      dbFiles = db.addCollection("files");
-    }
     if (dbCollections === null) {
       dbCollections = db.addCollection("collections");
     }
@@ -78,13 +89,14 @@ exports.setup = function (fm, program, db) {
     });
 
     console.log(newCollection);
-    db.saveDatabase(function (err) {
+    db.saveDatabase((err) => {
+      console.log(err)
       if (err) {
-        console.log("error : " + err);
+        winston.error('Failed to save DB');
       }
     });
 
-    return res.json({ id: newCollection['$loki'] });
+    return res.json(dbCollections.find({}));
   });
 
   fm.post("/collection/edit", function (req, res) {

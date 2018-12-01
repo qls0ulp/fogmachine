@@ -1,129 +1,47 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html lang="en">
 
 <head>
+  <title>Fog Machine</title>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
 
-  <title>FogMachine</title>
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/public/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/public/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/public/favicon/site.webmanifest">
+  <link rel="mask-icon" href="/public/favicon/safari-pinned-tab.svg" color="#5bbad5">
+  <link rel="shortcut icon" href="/public/favicon/favicon.ico">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="msapplication-config" content="/public/favicon/browserconfig.xml">
+  <meta name="theme-color" content="#ffffff">  
 
+  <!-- DOM Manipulation-->
+  <script src="/public/js/lib/jquery-2.2.4.min.js"></script>
   <script src="/public/js/lib/vue.min.js"></script>
-  <script src="/public/js/lib/cookie.js"></script>
 
+  <!-- Toast -->
   <script src="/public/js/lib/izi-toast.min.js"></script>
   <link rel="stylesheet" href="/public/css/izi-toast.min.css">
-
-  <link rel="stylesheet" href="/public/css/admin.css">
-
-  <script src="/public/js/lib/jquery-2.2.4.min.js"></script>
+  
+  <!-- Modal -->
+  <script src="/public/js/lib/modal.js"></script>
+  <link rel="stylesheet" href="/public/css/izi-modal.min.css">
 
   <!-- Pure CSS -->
   <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w"
   crossorigin="anonymous">
   <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/grids-responsive-min.css">
 
-  <script>
-    // Auth token needed to interact with the admin API
-    var authToken = '';
-  
-    window.onload = function () {
+  <!-- The code -->
+  <link rel="stylesheet" href="/public/css/admin.css">
+  <script src="/public/js/admin.js"></script>
 
-      // Setup jQuery AJAX engine to use our authToken
-      $.ajaxPrefilter(function (options) {
-        options.beforeSend = function (xhr) {
-          xhr.setRequestHeader('x-access-token', authToken);
-        }
-      });
-
-  
-      // Login Panel Vue Object
-      var loginPanel = new Vue({
-        el: '#login-overlay',
-        data: {
-          loginPending: false
-        },
-        methods: {
-          submitCode: function (e) {
-            // Store this for use in callbacks
-            var that = this;
-  
-            // Get Code
-            var username = $('#login-username').val();
-            var password = $('#login-password').val();
-            // Set pending flag
-            this.loginPending = true;
-  
-            // Check Code Against Server
-            var request = $.ajax({
-              url: "login",
-              type: "POST",
-              contentType: "application/json",
-              dataType: "json",
-              data: JSON.stringify({ username: username, password: password })
-            });
-  
-            request.done(function (msg) {
-              that.loginPending = false;
-  
-              if (!msg.token) {
-                that.loginError = 'Login Failed';
-
-                iziToast.error({
-                  title: 'Login Failed',
-                  position: 'topCenter',
-                  timeout: 3500
-                });
-                return;
-              }
-              authToken = msg.token;
-              Cookies.set('token', authToken);
-  
-              $('.login-overlay').fadeOut("slow");
-              callOnStart();
-            });
-  
-            request.fail(function (jqXHR, textStatus) {
-              that.loginPending = false;
-              iziToast.error({
-                title: 'Login Failed',
-                position: 'topCenter',
-                timeout: 3500
-              });
-            });
-          }
-        }
-      });
-  
-      // Function to test if the user is logged in with a valid token
-      function testAuthToken(token) {
-        if (token) {
-          authToken = token;
-        }
-  
-        var request = $.ajax({
-          url: "ping",
-          type: "GET",
-          dataType: "json",
-        });
-  
-        request.done(function (msg) {
-          callOnStart();
-        });
-  
-        request.fail(function (jqXHR, textStatus) {
-          $('.login-overlay').fadeIn("slow");
-          authToken = '';
-        });
-      }
-  
-      testAuthToken(Cookies.get('token'));
-  
-      function callOnStart() {
-        // Call the necessary APIs
-      }
-    };
-  </script>
-
+  <!-- Drag and Drop -->
+  <script src="/public/js/lib/sortable.js"></script>
+  <!-- https://github.com/SortableJS/Vue.Draggable - v2.14.1 -->
+  <script src="/public/js/lib/vue-sortable.js"></script>
 </head>
 
 <body>
@@ -155,5 +73,32 @@
     </div>
   </div>
 
-  <div>Hello World</div>
+  <header>
+    <span class="pure-menu-heading">FOGMACHINE</span>
+  </header>
+
+  <div class="main clearfix">
+    <div class="pure-menu nav-col">
+      <ul class="pure-menu-list">
+        <li class="pure-menu-item form-collections menu-item-divided">
+          <a href="JavaScript:void(0);" class="pure-menu-link">Collections</a>
+        </li>
+        <li class="pure-menu-item form-settings menu-item-divided">
+          <a href="JavaScript:void(0);" class="pure-menu-link">Settings</a>
+        </li>
+      </ul>
+    </div>
+
+    <div id="switcherMain" class="main-col">
+      <component v-bind:is="currentViewMain">
+      </component>
+    </div>
+
+    <div class="second-col">
+      <!-- <component v-bind:is="currentView">
+      </component> -->
+    </div>
+  </div>
 </body>
+
+</html>

@@ -8,7 +8,6 @@
   <title>FogMachine</title>
 
   <script src="/public/js/lib/vue.min.js"></script>
-  <script src="/public/js/lib/cookie.js"></script>
 
   <script src="/public/js/lib/izi-toast.min.js"></script>
   <link rel="stylesheet" href="/public/css/izi-toast.min.css">
@@ -76,7 +75,7 @@
                 return;
               }
               authToken = msg.token;
-              Cookies.set('token', authToken);
+              localStorage.setItem("token", authToken);
   
               $('.login-overlay').fadeOut("slow");
               callOnStart();
@@ -116,7 +115,7 @@
         });
       }
   
-      testAuthToken(Cookies.get('token'));
+      testAuthToken(localStorage.getItem("token"));
   
       function callOnStart() {
         // Call the necessary APIs
