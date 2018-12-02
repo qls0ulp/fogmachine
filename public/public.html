@@ -1,23 +1,34 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html lang="en">
 
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>FogMachine</title>
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/public/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/public/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/public/favicon/site.webmanifest">
+  <link rel="mask-icon" href="/public/favicon/safari-pinned-tab.svg" color="#5bbad5">
+  <link rel="shortcut icon" href="/public/favicon/favicon.ico">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="msapplication-config" content="/public/favicon/browserconfig.xml">
+  <meta name="theme-color" content="#ffffff">    
 
   <script src="/public/js/lib/jquery-2.2.4.min.js"></script>
 
   <script>
     var request = $.ajax({
-      url: "/api/test/all-public",
+      url: "/api/public/v1/collections",
       type: "GET",
       dataType: "json",
     });
 
     request.done(function (msg) {
       console.log(msg);
+      $('#print-here').html('<pre>' + JSON.stringify(msg, null, 2) + '</pre>' );
     });
 
     request.fail(function (jqXHR, textStatus) {
@@ -27,5 +38,9 @@
 </head>
 
 <body>
-
+  <br>
+  <div><a href="/admin">Go To Admin Panel</a></div>
+  <br><br>
+  <div>CURRENT COLLECTIONS:</div>
+  <div id="print-here"></div>
 </body>

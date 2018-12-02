@@ -15,7 +15,7 @@ exports.public = function (fm, program) {
   db = new loki(fe.join(program.storage.dbDirectory, program.filesDbName));
 
   fm.get('/api/public/v1/collections', (req, res) => {
-    res.json([{"id":"1","name":"MyFirstSingle","type":"single","genre":"house","transcoded":false,"media":[{"title":"MyFirstSingle","file":"/media/1/single.mp3","trackNo":1,"waveform":"/media/path/to/waveform.svg"}]},{"id":"2","name":"MyFirstAlbum","type":"album","genre":"house","transcoded":true,"media":[{"title":"Thefirstsong","file":"/media/2/song1.mp3","trackNo":1,"waveform":"/media/path/to/waveform2.svg"},{"title":"Thesecondsong","file":"/media/2/song2.mp3","trackNo":2,"waveform":"/media/path/to/waveform3.svg"},{"title":"Thethirdsong","file":"/media/3/song3.mp3","trackNo":3,"waveform":"/media/path/to/waveform4.svg"}]}]);
+    res.json(dbCollections.chain().find({}).simplesort('order').data());
     // hide stuff user should not see
   });
 }
