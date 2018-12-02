@@ -83,7 +83,7 @@
   padding: 0;
   height: 100%;
   width: calc(50% - 75px);
-  background-color: green;
+  background-color: lightcyan;
   overflow-y: auto;
 }
 

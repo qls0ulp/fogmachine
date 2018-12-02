@@ -22,7 +22,7 @@ exports.public = function (fm, program) {
 
 exports.admin = function (fm, program) {
   function adminGetAllCollections() {
-    const results = dbCollections.find({});
+    const results = dbCollections.chain().find({}).simplesort('order').data();
     // TODO: SORT
     return results;
   }
@@ -42,7 +42,7 @@ exports.admin = function (fm, program) {
       dbOrders = db.addCollection("orders");
     }
   });
-  
+
   fm.get('/api/admin/v1/collections', (req, res) => {
     return res.json(adminGetAllCollections());
   });
@@ -64,7 +64,7 @@ exports.admin = function (fm, program) {
       name: Joi.string().allow(''),
       type: Joi.string().allow(''),
       status: Joi.string().valid('free', 'subscriber', 'paid'),
-      price: Joi.number().min(1),
+      price: Joi.number().min(0),
       version: Joi.string().allow(''),
       public: Joi.boolean(),
       transcode: Joi.boolean()
@@ -75,8 +75,6 @@ exports.admin = function (fm, program) {
       return res.status(422).json({ error: 'input error', errorList: valid.error });
     }
 
-    console.log(req.body)
-
     const newCollection = dbCollections.insert({
       name: req.body.name ? req.body.name : '',
       type: req.body.type ? req.body.type : '',
@@ -85,6 +83,7 @@ exports.admin = function (fm, program) {
       version: req.body.version ? req.body.version : '',
       public: req.body.public ? req.body.public : false,
       transcode: req.body.transcode ? req.body.transcode : false,
+      songs: [],
       order: 0 // TODO: Fill this in automatically
     });
 
@@ -104,8 +103,16 @@ exports.admin = function (fm, program) {
       // Lock other editing calls during edit
   });
 
-  fm.post("/collection/order", function (req, res) {
-    // Special endpoint for ordering collections
+  fm.post("/collections/reorder", function (req, res) {
+    const collections = req.body;
+
+    let n = 1;
+    for (const c of collections) {
+      dbCollections.chain().find({ '$loki': c['$loki'] }).update(o => o.order = n);
+      n++;
+    }
+
+    res.json({ success: true });
   });
 
   fm.post("/collection/:collectionId/upload", function (req, res) {

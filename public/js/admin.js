@@ -1,10 +1,8 @@
 // Auth token needed to interact with the admin API
 var authToken = '';
-
-var collections = [];
+var collectionsArray = [];
 
 window.onload = function () {
-
   // Setup jQuery AJAX engine to use our authToken
   $.ajaxPrefilter(function (options) {
     options.beforeSend = function (xhr) {
@@ -12,13 +10,10 @@ window.onload = function () {
     }
   });
 
-
   // Login Panel Vue Object
-  var loginPanel = new Vue({
+  new Vue({
     el: '#login-overlay',
-    data: {
-      loginPending: false
-    },
+    data: { loginPending: false },
     methods: {
       submitCode: function (e) {
         // Store this for use in callbacks
@@ -119,8 +114,6 @@ window.onload = function () {
     });
   }
 
-  var collectionsArray = [{name: 'rgreg'},{name: 'eth'},{name: 'rger wrgreg'},{name: 'er wg reg'}];
-
   var collectionsView = Vue.component('collections-list', {
     template: `<div>
         <form v-on:submit.prevent="addCollection($event)">
@@ -137,15 +130,37 @@ window.onload = function () {
     },
     methods: {
       checkMove: function (event) {
-        // TODO: Re-order
-        console.log('Order')
+        var request = $.ajax({
+          url: "/collections/reorder",
+          type: "POST",
+          contentType: "application/json",
+          dataType: "json",
+          data: JSON.stringify(collectionsArray)
+        });
+
+        request.done(function (response) {
+          iziToast.success({
+            title: 'Order Successfully Updated',
+            position: 'topCenter'
+          });
+        });
+
+        request.fail(function (jqXHR, textStatus) {
+          // TODO: Return List to original state
+          iziToast.error({
+            title: 'Error!',
+            message: 'Order Failed to Update. Refresh page and try again',
+            position: 'topCenter'
+          });
+        });
       },
       addCollection: function(e) {
         var request = $.ajax({
           url: "/collection/create",
+          contentType: "application/json",
           type: "POST",
           dataType: "json",
-          data: { name: $('#new-collection-name').val() }
+          data: JSON.stringify({ name: $('#new-collection-name').val() })
         });
 
         request.done(function (msg) {
@@ -176,7 +191,7 @@ window.onload = function () {
     //   </div>\
     // </div>',
     template: '\
-    <div v-on:click="wooHoo()" class="collection-item" >\
+    <div v-on:click="onClick()" class="collection-item" >\
       <div class="drag-handle"><img class="drag-handle-img" src="/public/img/drag-handle.svg"></div>\
       <span>{{data.name}}</span>\
     </div>',
@@ -187,8 +202,10 @@ window.onload = function () {
         console.log('REMOVE')
         // eventCurrentItems.splice(this.index, 1);
       },
-      wooHoo: function () {
+      onClick: function () {
+        console.log(this.data)
         console.log('CLICK')
+        vm2.secondView = oneCollection;
       },
     }
   });
@@ -208,15 +225,28 @@ window.onload = function () {
     }
   });
 
+  var oneCollection = Vue.component('admin-settings', {
+    template: '<div>HELLO COLLECTION</div>'
+  });
+
+  var vm2 = new Vue({
+    el: '#secondColSwitcher',
+    data: {
+      secondView: false
+    }
+  });
+
   $('.form-collections').on('click', function () {
     $('.pure-menu-item').removeClass('pure-menu-selected');
     $(this).addClass('pure-menu-selected');
     vm.currentViewMain = 'collections-list'; // Because naming this details just fucking breaks vue. WTF???
+    vm2.secondView = null;
   });
 
   $('.form-settings').on('click', function () {
     $('.pure-menu-item').removeClass('pure-menu-selected');
     $(this).addClass('pure-menu-selected');
     vm.currentViewMain = 'admin-settings';
+    vm2.secondView = null;
   });
 };
