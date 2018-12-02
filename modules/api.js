@@ -112,6 +112,12 @@ exports.admin = function (fm, program) {
       n++;
     }
 
+    db.saveDatabase((err) => {
+      if (err) {
+        winston.error('Failed to save DB');
+      }
+    });
+
     res.json({ success: true });
   });
 
