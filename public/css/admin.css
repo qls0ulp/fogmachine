@@ -149,6 +149,7 @@ html, body {
   height: 25px;
   width: 25px;
   cursor: move;
+  float: left;
 }
 
 .clearfix::after {
@@ -161,4 +162,13 @@ header{
   min-height: 40px;
   border-bottom: 1px solid #333;
   background-color: #333333;
+}
+
+.collection-item:hover{
+  background-color: #9397cd;
+}
+
+.collection-item{
+  cursor: pointer;
+  min-height: 30px;
 }

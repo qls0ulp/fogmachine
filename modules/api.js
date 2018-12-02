@@ -14,17 +14,18 @@ var dbOrders;
 exports.public = function (fm, program) {
   db = new loki(fe.join(program.storage.dbDirectory, program.filesDbName));
 
-  fm.get('/collections', (req, res) => {
-    // res.json([{"id":"1","name":"MyFirstSingle","type":"single","genre":"house","transcoded":false,"media":[{"title":"MyFirstSingle","file":"/media/1/single.mp3","trackNo":1,"waveform":"/media/path/to/waveform.svg"}]},{"id":"2","name":"MyFirstAlbum","type":"album","genre":"house","transcoded":true,"media":[{"title":"Thefirstsong","file":"/media/2/song1.mp3","trackNo":1,"waveform":"/media/path/to/waveform2.svg"},{"title":"Thesecondsong","file":"/media/2/song2.mp3","trackNo":2,"waveform":"/media/path/to/waveform3.svg"},{"title":"Thethirdsong","file":"/media/3/song3.mp3","trackNo":3,"waveform":"/media/path/to/waveform4.svg"}]}]);
-    const results = dbCollections.find({}); // TODO: Public Collections only
-    // TODO: SORT
-    res.json(results);
+  fm.get('/api/public/v1/collections', (req, res) => {
+    res.json([{"id":"1","name":"MyFirstSingle","type":"single","genre":"house","transcoded":false,"media":[{"title":"MyFirstSingle","file":"/media/1/single.mp3","trackNo":1,"waveform":"/media/path/to/waveform.svg"}]},{"id":"2","name":"MyFirstAlbum","type":"album","genre":"house","transcoded":true,"media":[{"title":"Thefirstsong","file":"/media/2/song1.mp3","trackNo":1,"waveform":"/media/path/to/waveform2.svg"},{"title":"Thesecondsong","file":"/media/2/song2.mp3","trackNo":2,"waveform":"/media/path/to/waveform3.svg"},{"title":"Thethirdsong","file":"/media/3/song3.mp3","trackNo":3,"waveform":"/media/path/to/waveform4.svg"}]}]);
+    // hide stuff user should not see
   });
 }
 
 exports.admin = function (fm, program) {
-  // DB
-
+  function adminGetAllCollections() {
+    const results = dbCollections.find({});
+    // TODO: SORT
+    return results;
+  }
 
   db.loadDatabase({}, () => {
     dbCollections = db.getCollection("collections");
@@ -41,12 +42,10 @@ exports.admin = function (fm, program) {
       dbOrders = db.addCollection("orders");
     }
   });
-
-
-  function _validate (schema, body) {
-    return Joi.validate(body, schema, { allowUnknown: true, presence: 'optional' });
-  }
-
+  
+  fm.get('/api/admin/v1/collections', (req, res) => {
+    return res.json(adminGetAllCollections());
+  });
 
   fm.post("/collection/create", function (req, res) {
     // Name
@@ -71,11 +70,12 @@ exports.admin = function (fm, program) {
       transcode: Joi.boolean()
     });
 
-    const valid = _validate(req.body, schema);
+    const valid = Joi.validate(req.body, schema, { allowUnknown: true, presence: 'optional' });
     if (valid.error) {
-      console.log(valid.error);
       return res.status(422).json({ error: 'input error', errorList: valid.error });
     }
+
+    console.log(req.body)
 
     const newCollection = dbCollections.insert({
       name: req.body.name ? req.body.name : '',
@@ -88,15 +88,13 @@ exports.admin = function (fm, program) {
       order: 0 // TODO: Fill this in automatically
     });
 
-    console.log(newCollection);
     db.saveDatabase((err) => {
-      console.log(err)
       if (err) {
         winston.error('Failed to save DB');
       }
     });
 
-    return res.json(dbCollections.find({}));
+    return res.json(adminGetAllCollections());
   });
 
   fm.post("/collection/edit", function (req, res) {

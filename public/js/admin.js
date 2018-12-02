@@ -78,7 +78,7 @@ window.onload = function () {
     }
 
     var request = $.ajax({
-      url: "ping",
+      url: "/ping",
       type: "GET",
       dataType: "json",
     });
@@ -100,21 +100,26 @@ window.onload = function () {
   }
 
   function getCollections() {
-    // var request = $.ajax({
-    //   url: "ping",
-    //   type: "GET",
-    //   dataType: "json",
-    // });
+    var request = $.ajax({
+      url: "/api/admin/v1/collections",
+      type: "GET",
+      dataType: "json",
+    });
 
-    // request.done(function (msg) {
-    //   callOnStart();
-    // });
+    request.done(function (msg) {
+      collectionsArray.length = 0;
+      for (var property of msg) {
+        collectionsArray.push(property);
+      }
+    });
 
-    // request.fail(function (jqXHR, textStatus) {
-    //   $('.login-overlay').fadeIn("slow");
-    //   authToken = '';
-    // });
+    request.fail(function (jqXHR, textStatus) {
+      $('.login-overlay').fadeIn("slow");
+      authToken = '';
+    });
   }
+
+  var collectionsArray = [{name: 'rgreg'},{name: 'eth'},{name: 'rger wrgreg'},{name: 'er wg reg'}];
 
   var collectionsView = Vue.component('collections-list', {
     template: `<div>
@@ -122,32 +127,70 @@ window.onload = function () {
           <input id="new-collection-name" type="text">
           <input type="submit" value="Add Collection">
         </form>
-
-        <div></div>
+        <draggable :options="{handle:'.drag-handle'}" @update="checkMove" :list="collections" id="collections-list">
+          <div v-for="(data, index) in collections" is="collection-item" :key="index" :index="index" :data="data">
+          </div>
+        </draggable>
       </div>`,
-      methods: {
-        addCollection: function(e) {
-          console.log('ADD ER ALL')
-          var request = $.ajax({
-            url: "/collection/create",
-            type: "POST",
-            dataType: "json",
-            data: JSON.stringify({ name: $('#new-collection-name').val() })
-          });
+    data: function() {
+      return { collections: collectionsArray };
+    },
+    methods: {
+      checkMove: function (event) {
+        // TODO: Re-order
+        console.log('Order')
+      },
+      addCollection: function(e) {
+        var request = $.ajax({
+          url: "/collection/create",
+          type: "POST",
+          dataType: "json",
+          data: { name: $('#new-collection-name').val() }
+        });
 
-          request.done(function (msg) {
-            console.log(msg)
-          });
+        request.done(function (msg) {
+          collectionsArray.length = 0;
+          for (var property of msg) {
+            collectionsArray.push(property);
+          }
+        });
 
-          request.fail(function (jqXHR, textStatus) {
-            iziToast.error({
-              title: 'Failed to add collection',
-              position: 'topCenter',
-              timeout: 3500
-            });
+        request.fail(function (jqXHR, textStatus) {
+          iziToast.error({
+            title: 'Failed to add collection',
+            position: 'topCenter',
+            timeout: 3500
           });
-        }
+        });
       }
+    }
+  });
+
+  Vue.component('collection-item', {
+    // template: '\
+    // <div class="event-item max6" >\
+    //   <div class="drag-handle"><img class="drag-handle-img" src="/public/img/drag-handle.svg"></div>\
+    //   <div class="event-item-main">\
+    //     <button v-on:click="removeItem($event)"  class="event-item-x" type="button" aria-label="Close popup">×</button>\
+    //     <div><label>Name:</label><input required v-model=""></div>\
+    //   </div>\
+    // </div>',
+    template: '\
+    <div v-on:click="wooHoo()" class="collection-item" >\
+      <div class="drag-handle"><img class="drag-handle-img" src="/public/img/drag-handle.svg"></div>\
+      <span>{{data.name}}</span>\
+    </div>',
+    props: ['index', 'data'],
+    methods: {
+      removeItem: function (event) {
+        // TODO: 
+        console.log('REMOVE')
+        // eventCurrentItems.splice(this.index, 1);
+      },
+      wooHoo: function () {
+        console.log('CLICK')
+      },
+    }
   });
 
   var settingsView = Vue.component('admin-settings', {
