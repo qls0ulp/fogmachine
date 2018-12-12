@@ -127,7 +127,6 @@ exports.admin = function (fm, program) {
     }
 
     var result = dbCollections.get(  Number(req.headers['data-collection'])  );
-    console.log(result)
     if (!result) {
       res.status(422).json({ error: 'Collection not found' });
       return;
@@ -168,6 +167,17 @@ exports.admin = function (fm, program) {
 
       // write song
       file.pipe(fs.createWriteStream( fe.join(saveTo, filename) ));
+
+      dbCollections.chain().find({ '$loki': Number(req.headers['data-collection']) }).update(o => o.songs.push({
+        serverPath: `${saveTo}/${filename}`,
+        frontedPath: `/media/${req.headers['data-collection']}/${filename}`
+      }));
+
+      db.saveDatabase((err) => {
+        if (err) {
+          winston.error('Failed to save DB');
+        }
+      });
 
       // Create song in DB
       // add all paths to DB
