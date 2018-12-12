@@ -121,21 +121,19 @@ exports.admin = function (fm, program) {
     res.json({ success: true });
   });
 
-  fm.post("/collection/:collectionId/upload", function (req, res) {
-    if (!req.params['collectionId']) {
+  fm.post("/collection/upload", function (req, res) {
+    if (!req.headers['data-collection']) {
       return res.status(500).json({ error: 'No collection Provided' });
     }
 
-    console.log(req.params['collectionId'])
-
-    var result = dbCollections.get(  Number(req.params['collectionId'])  );
+    var result = dbCollections.get(  Number(req.headers['data-collection'])  );
     console.log(result)
     if (!result) {
       res.status(422).json({ error: 'Collection not found' });
       return;
     }
 
-    const saveTo = fe.join(program.media, req.params['collectionId']);
+    const saveTo = fe.join(program.storage.mediaDirectory, req.headers['data-collection']);
     if (!fs.existsSync(saveTo)) {
       makeDir.sync(saveTo);
     }

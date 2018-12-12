@@ -53,8 +53,6 @@
   padding: 0;
   width: 100%;
   height: calc(100% - 41px);
-  background-color: red;
-
   position: fixed;
 }
 

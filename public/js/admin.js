@@ -2,6 +2,12 @@
 var authToken = '';
 var collectionsArray = [];
 
+var currentCollection = {
+  id: null,
+  name: null,
+  files: []
+};
+
 window.onload = function () {
   // Setup jQuery AJAX engine to use our authToken
   $.ajaxPrefilter(function (options) {
@@ -206,6 +212,9 @@ window.onload = function () {
         console.log(this.data)
         console.log('CLICK')
         vm2.secondView = oneCollection;
+
+        currentCollection.name = this.data.name;
+        currentCollection.id = this.data['$loki'];
       },
     }
   });
@@ -225,8 +234,11 @@ window.onload = function () {
     }
   });
 
-  var oneCollection = Vue.component('admin-settings', {
-    template: '<div>HELLO COLLECTION</div>'
+  var oneCollection = Vue.component('one-collection', {
+    template: '<div><div>Collection: {{this.name}}</div><div>ID: {{this.id}}</div></div>',
+    data: function() {
+      return currentCollection;
+    }
   });
 
   var vm2 = new Vue({
@@ -248,5 +260,90 @@ window.onload = function () {
     $(this).addClass('pure-menu-selected');
     vm.currentViewMain = 'admin-settings';
     vm2.secondView = null;
+  });
+
+  // Dropzone
+  const myDropzone = new Dropzone(document.body, {
+    previewsContainer: false,
+    clickable: false,
+    url: '/collection/upload',
+    maxFilesize: null
+  });
+
+  myDropzone.on("addedfile", function(file) {
+    if (!currentCollection) {
+      iziToast.error({
+        title: 'No Collection',
+        position: 'topCenter',
+        timeout: 3500
+      });
+      myDropzone.removeFile(file);
+      return;
+    }
+
+    file.collectionId = currentCollection.id;
+  });
+
+  myDropzone.on('sending', function (file, xhr, formData) {
+    xhr.setRequestHeader('data-collection', file.collectionId)
+    xhr.setRequestHeader('x-access-token', authToken)
+  });
+
+  myDropzone.on('totaluploadprogress', function (percent, uploaded, size) {
+    // $('.upload-progress-inner').css('width', (percent) + '%');
+    // if (percent === 100) {
+    //   $('.upload-progress-inner').css('width', '0%');
+    // }
+    console.log(percent);
+  });
+
+  myDropzone.on('queuecomplete', function (file, xhr, formData) {
+    var successCount = 0;
+    for (var i = 0; i < myDropzone.files.length; i++) {
+      if (myDropzone.files[i].status === 'success') {
+        successCount += 1;
+      }
+    }
+
+    if (successCount === myDropzone.files.length) {
+      iziToast.success({
+        title: 'Files Uploaded',
+        position: 'topCenter',
+        timeout: 3500
+      });
+      // TODO: Reload the collection
+      //if (programState[0].state === 'fileExplorer') {
+        // senddir(false, fileExplorerArray);
+      //}
+    } else if (successCount === 0) {
+      // do nothing
+    } else {
+      iziToast.warning({
+        title: successCount + ' out of ' + myDropzone.files.length + ' were uploaded successfully',
+        position: 'topCenter',
+        timeout: 3500
+      });
+
+      // TODO: Reload the collection
+      // if (programState[0].state === 'fileExplorer') {
+        // senddir(false, fileExplorerArray);
+      // }
+    }
+
+    myDropzone.removeAllFiles()
+  });
+
+  myDropzone.on('error', function (err, msg, xhr) {
+    var iziStuff = {
+      title: 'Upload Failed',
+      position: 'topCenter',
+      timeout: 3500
+    };
+
+    if (msg.error) {
+      iziStuff.message = msg.error;
+    }
+
+    iziToast.error(iziStuff);
   });
 };

@@ -3,6 +3,9 @@ node_modules/*
 image-cache/*
 !image-cache/README.md
 
+media/*
+!media/README.md
+
 save/*.json
 
 package-lock.json
